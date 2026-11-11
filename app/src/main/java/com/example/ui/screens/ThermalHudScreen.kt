@@ -6,6 +6,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,6 +33,7 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CropFree
 import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.FilterDrama
+import androidx.compose.material.icons.filled.Flight
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LocationSearching
 import androidx.compose.material.icons.filled.Lock
@@ -92,6 +97,7 @@ import com.example.model.LabScenario
 import com.example.model.ThermalFusionMode
 import com.example.model.ThermalPalette
 import com.example.ui.components.AvionicsHudOverlay
+import com.example.ui.components.DroneTelemetryOverlay
 import com.example.ui.components.DroneVideoBackdropView
 import com.example.ui.components.ThermalHeatmapOverlayView
 import com.example.ui.theme.DeepObsidian
@@ -144,6 +150,7 @@ fun ThermalHudScreen(
     var showHeatmapControlsSheet by remember { mutableStateOf(false) }
     var showIsothermDialog by remember { mutableStateOf(false) }
     var showSnapshotDialog by remember { mutableStateOf(false) }
+    var showTelemetryOverlay by remember { mutableStateOf(true) }
     var snapshotTitle by remember { mutableStateOf("Thermal Inspection Snapshot") }
     var snapshotNotes by remember { mutableStateOf("") }
 
@@ -250,6 +257,54 @@ fun ThermalHudScreen(
             onDismissAlert = { viewModel.dismissAlertBanner() },
             onTogglePalette = { viewModel.cycleNextPalette() }
         )
+
+        // 2.5 Translucent Drone Telemetry Overlay (Altitude, Battery, GPS, Gimbal Orientation)
+        AnimatedVisibility(
+            visible = showTelemetryOverlay,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically(),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 44.dp, start = 8.dp, end = 8.dp)
+        ) {
+            DroneTelemetryOverlay(
+                telemetry = djiTelemetry,
+                initiallyExpanded = true,
+                onClose = { showTelemetryOverlay = false }
+            )
+        }
+
+        // Floating quick-open badge when overlay is closed
+        if (!showTelemetryOverlay) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 38.dp, end = 8.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(Color(0xD9090D12))
+                    .border(1.dp, ThermalAmber.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
+                    .clickable { showTelemetryOverlay = true }
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .testTag("toggle_telemetry_overlay_floating_chip")
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Flight,
+                        contentDescription = "Open Telemetry HUD",
+                        tint = ThermalAmber,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "LIVE TELEMETRY",
+                        color = TextPrimary,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace
+                    )
+                }
+            }
+        }
 
         // 3. Bottom Mission Control Panel
         Column(
@@ -546,6 +601,27 @@ fun ThermalHudScreen(
                         fontSize = 9.sp,
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Bold
+                    )
+                }
+
+                // 0.5 Translucent Drone Telemetry Overlay Toggle
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .clickable { showTelemetryOverlay = !showTelemetryOverlay }
+                        .testTag("toggle_telemetry_overlay_button")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Flight,
+                        contentDescription = "Drone Telemetry",
+                        tint = if (showTelemetryOverlay) TelemetryGreen else TextMuted,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = if (showTelemetryOverlay) "TLM ON" else "TLM OFF",
+                        color = if (showTelemetryOverlay) TelemetryGreen else TextMuted,
+                        fontSize = 9.sp,
+                        fontFamily = FontFamily.Monospace
                     )
                 }
 

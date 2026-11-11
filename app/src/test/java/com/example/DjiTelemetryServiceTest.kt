@@ -115,4 +115,49 @@ class DjiTelemetryServiceTest {
         val southWestAttitude = DjiAttitudeTelemetry(compassHeadingDegrees = 225.0f)
         assertEquals("SW", southWestAttitude.formatHeadingCardinal())
     }
+
+    @Test
+    fun `test Translucent Overlay telemetry models for altitude battery gps and gimbal`() {
+        val comprehensive = com.example.dji.model.DjiComprehensiveTelemetry(
+            modelName = "DJI Matrice 4TD",
+            gps = DjiGpsTelemetry(
+                latitude = 37.7749,
+                longitude = -122.4194,
+                altitudeAglMeters = 65.5f,
+                altitudeMslMeters = 72.0,
+                satelliteCount = 28,
+                fixType = com.example.dji.model.GpsFixType.RTK_FIXED
+            ),
+            battery = com.example.dji.model.DjiBatteryTelemetry(
+                chargeRemainingPercent = 79,
+                voltageMv = 22750,
+                temperatureCelsius = 29.2f
+            ),
+            gimbal = com.example.dji.model.DjiGimbalTelemetry(
+                pitchDegrees = -45.0f,
+                rollDegrees = 0.0f,
+                yawDegrees = 12.0f,
+                isCalibrated = true
+            )
+        )
+
+        // 1. Altitude assertions
+        assertEquals(65.5f, comprehensive.gps.altitudeAglMeters, 0.01f)
+        assertEquals(72.0, comprehensive.gps.altitudeMslMeters, 0.01)
+
+        // 2. Battery assertions
+        assertEquals(79, comprehensive.battery.chargeRemainingPercent)
+        assertEquals(22.75f, comprehensive.battery.voltageMv / 1000f, 0.01f)
+
+        // 3. GPS assertions
+        val formattedCoords = comprehensive.gps.formatCoordinates()
+        assertTrue(formattedCoords.contains("37.774900° N"))
+        assertTrue(formattedCoords.contains("122.419400° W"))
+        assertEquals(com.example.dji.model.GpsFixType.RTK_FIXED, comprehensive.gps.fixType)
+
+        // 4. Gimbal assertions
+        assertEquals(-45.0f, comprehensive.gimbal.pitchDegrees, 0.01f)
+        assertTrue(comprehensive.gimbal.isCalibrated)
+    }
 }
+
