@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CompassCalibration
 import androidx.compose.material.icons.filled.Explore
@@ -78,6 +79,7 @@ import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
 import com.example.ui.theme.ThermalAmber
 import com.example.ui.theme.ThermalColdCyan
+import com.example.ui.theme.ThermalCoreYellow
 import com.example.ui.theme.ThermalHotRed
 import com.example.viewmodel.ThermalViewModel
 
@@ -85,8 +87,9 @@ import com.example.viewmodel.ThermalViewModel
 fun HomeScreen(
     viewModel: ThermalViewModel,
     onNavigateToHud: () -> Unit,
+    onNavigateToAiCopilot: () -> Unit = {},
     onNavigateToAlerts: () -> Unit,
-    onNavigateToReports: () -> Unit,
+    onNavigateToReports: () -> Unit = {},
     onNavigateToCalibration: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -546,6 +549,90 @@ fun HomeScreen(
                                 modifier = Modifier.size(18.dp)
                             )
                         }
+                    }
+                }
+            }
+        }
+
+        // 4.5 Gemini AI Copilot Card
+        item {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+                border = androidx.compose.foundation.BorderStroke(1.dp, ThermalAmber.copy(alpha = 0.7f)),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onNavigateToAiCopilot() }
+                    .testTag("home_ai_copilot_card")
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(
+                                    Brush.linearGradient(
+                                        listOf(ThermalAmber, ThermalCoreYellow)
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AutoAwesome,
+                                contentDescription = "Gemini AI",
+                                tint = DeepObsidian,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "GEMINI 3.8 FLASH COPILOT",
+                                    color = TextPrimary,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = FontFamily.Monospace
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "AI",
+                                    color = DeepObsidian,
+                                    fontSize = 8.sp,
+                                    fontWeight = FontWeight.Black,
+                                    fontFamily = FontFamily.Monospace,
+                                    modifier = Modifier
+                                        .background(ThermalAmber, RoundedCornerShape(2.dp))
+                                        .padding(horizontal = 4.dp, vertical = 1.dp)
+                                )
+                            }
+                            Text(
+                                text = "Real-time hotspot diagnostics & location intelligence",
+                                color = TextSecondary,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+
+                    Button(
+                        onClick = onNavigateToAiCopilot,
+                        colors = ButtonDefaults.buttonColors(containerColor = ThermalAmber),
+                        shape = RoundedCornerShape(6.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Text("ASK AI", fontSize = 11.sp, color = DeepObsidian, fontWeight = FontWeight.Bold)
                     }
                 }
             }

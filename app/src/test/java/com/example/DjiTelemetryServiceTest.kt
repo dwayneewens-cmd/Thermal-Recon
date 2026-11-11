@@ -159,5 +159,26 @@ class DjiTelemetryServiceTest {
         assertEquals(-45.0f, comprehensive.gimbal.pitchDegrees, 0.01f)
         assertTrue(comprehensive.gimbal.isCalibrated)
     }
+
+    @Test
+    fun `test AI Mission Report data structure and severity scoring`() {
+        val report = com.example.ai.model.AiMissionReport(
+            anomalyClassification = "Electrical Substation Bushing Overheat",
+            severityLevel = "CRITICAL",
+            estimatedTargetTempC = 94.2,
+            deltaTempFromAmbientC = 62.5,
+            flightRecommendation = "Maintain 30m standoff distance at -90° Nadir",
+            geographicContext = "Substation Pad 4B, GPS 47.606200° N, 122.332100° W",
+            emergencyActionSummary = "Immediate load shedding and dispatch thermal crew",
+            confidenceScore = 0.96
+        )
+
+        assertEquals("CRITICAL", report.severityLevel)
+        assertEquals(94.2, report.estimatedTargetTempC, 0.01)
+        assertEquals(62.5, report.deltaTempFromAmbientC, 0.01)
+        assertTrue(report.flightRecommendation.contains("Nadir"))
+        assertTrue(report.confidenceScore >= 0.9)
+    }
 }
+
 

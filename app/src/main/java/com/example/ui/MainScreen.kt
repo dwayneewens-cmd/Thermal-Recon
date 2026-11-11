@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.outlined.Assessment
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Tune
@@ -31,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -40,6 +43,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.screens.AiCopilotScreen
 import com.example.ui.screens.AlertsScreen
 import com.example.ui.screens.CalibrationScreen
 import com.example.ui.screens.HomeScreen
@@ -53,6 +57,7 @@ import com.example.ui.theme.TextMuted
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.ThermalAmber
 import com.example.ui.theme.ThermalHotRed
+import com.example.viewmodel.ThermalAiViewModel
 import com.example.viewmodel.ThermalViewModel
 
 data class NavItem(
@@ -69,12 +74,13 @@ fun MainScreen(
 ) {
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val alertsLog by viewModel.alertsLog.collectAsState()
+    val aiViewModel = remember { ThermalAiViewModel() }
 
     val navItems = listOf(
         NavItem("Home", Icons.Filled.Home, Icons.Outlined.Home, "nav_home"),
         NavItem("Thermal HUD", Icons.Filled.Videocam, Icons.Outlined.Videocam, "nav_hud"),
+        NavItem("AI Copilot", Icons.Filled.AutoAwesome, Icons.Outlined.AutoAwesome, "nav_ai_copilot"),
         NavItem("Heat Alerts", Icons.Filled.NotificationsActive, Icons.Outlined.Notifications, "nav_alerts"),
-        NavItem("Reports", Icons.Filled.Assessment, Icons.Outlined.Assessment, "nav_reports"),
         NavItem("Calibration", Icons.Filled.Tune, Icons.Outlined.Tune, "nav_calibration")
     )
 
@@ -149,13 +155,20 @@ fun MainScreen(
                 0 -> HomeScreen(
                     viewModel = viewModel,
                     onNavigateToHud = { selectedIndex = 1 },
-                    onNavigateToAlerts = { selectedIndex = 2 },
-                    onNavigateToReports = { selectedIndex = 3 },
+                    onNavigateToAiCopilot = { selectedIndex = 2 },
+                    onNavigateToAlerts = { selectedIndex = 3 },
                     onNavigateToCalibration = { selectedIndex = 4 }
                 )
-                1 -> ThermalHudScreen(viewModel = viewModel)
-                2 -> AlertsScreen(viewModel = viewModel)
-                3 -> ReportsScreen(viewModel = viewModel)
+                1 -> ThermalHudScreen(
+                    viewModel = viewModel,
+                    onNavigateToAiCopilot = { selectedIndex = 2 }
+                )
+                2 -> AiCopilotScreen(
+                    aiViewModel = aiViewModel,
+                    thermalViewModel = viewModel,
+                    onNavigateToHud = { selectedIndex = 1 }
+                )
+                3 -> AlertsScreen(viewModel = viewModel)
                 4 -> CalibrationScreen(viewModel = viewModel)
             }
         }

@@ -29,6 +29,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CropFree
 import androidx.compose.material.icons.filled.FiberManualRecord
@@ -120,6 +121,7 @@ import com.example.viewmodel.ThermalViewModel
 @Composable
 fun ThermalHudScreen(
     viewModel: ThermalViewModel,
+    onNavigateToAiCopilot: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -623,6 +625,30 @@ fun ThermalHudScreen(
                         fontSize = 9.sp,
                         fontFamily = FontFamily.Monospace
                     )
+                }
+
+                // 0.6 Gemini Thermal AI Copilot Action
+                if (onNavigateToAiCopilot != null) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .clickable { onNavigateToAiCopilot() }
+                            .testTag("hud_ai_copilot_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = "AI Copilot",
+                            tint = ThermalAmber,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            text = "AI COPILOT",
+                            color = ThermalAmber,
+                            fontSize = 8.sp,
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
                 // 1. Palette Switcher
