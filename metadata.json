@@ -1,0 +1,6 @@
+{
+  "name": "Thermal Recon",
+  "description": "Real-time thermal heat signature recognition, DJI drone telemetry, infrared camera mapping, spot tracking, and high-precision heat anomaly alerts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
